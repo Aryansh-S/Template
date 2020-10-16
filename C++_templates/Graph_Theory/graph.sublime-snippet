@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-template<typename T>
+template<class T>
 struct graph{
 	struct edge{
 		int from, to;

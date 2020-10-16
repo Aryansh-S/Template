@@ -4,7 +4,7 @@ template<class T>
 vector<int> longest_increasing_subsequence(const vector<T> &a){ // O(n log n), returns the indices
 	int n = int(a.size());
 	if(!n) return {};
-	vector<int> prev(n);
+	vector<int> pr(n);
 	typedef pair<T, int> p;
 	vector<p> active;
 	for(int i = 0; i < n; ++ i){
@@ -12,11 +12,11 @@ vector<int> longest_increasing_subsequence(const vector<T> &a){ // O(n log n), r
 		auto it = lower_bound(active.begin(), active.end(), p{a[i], 0});
 		if(it == active.end()) active.emplace_back(), it = prev(active.end());
 		*it = {a[i], i};
-		prev[i] = it == active.begin() ? 0 : prev(it)->second;
+		pr[i] = it == active.begin() ? 0 : prev(it)->second;
 	}
 	int L = int(active.size()), cur = active.back().second;
 	vector<int> res(L);
-	while(L --) res[L] = cur, cur = prev[cur];
+	while(L --) res[L] = cur, cur = pr[cur];
 	return res;
 }
 ]]></content>

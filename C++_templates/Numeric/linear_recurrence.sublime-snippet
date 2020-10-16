@@ -66,11 +66,15 @@ vector<T> minimal_polynomial(int N, const vector<tuple<int, int, T>> &a){ // O(N
 } // Randomized
 template<class T> // calculate the determinant of the sparse matrix
 T determinant(int N, vector<tuple<int, int, T>> a){
-	T c;
-	do c = rng(); while(!c);
-	for(auto &x: a) get<2>(x) *= c;
+	vector<T> D(N);
+	T detD = 1;
+	for(auto &x: D){
+		do x = rng(); while(!x);
+		detD *= x;
+	}
+	for(auto &[i, j, val]: a) val *= D[i];
 	T det = minimal_polynomial(N, a)[0] * (N & 1 ? -1 : 1);
-	return det / (c ^ N);
+	return det / detD;
 } // Randomized
 ]]></content>
 	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->

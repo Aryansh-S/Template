@@ -1,8 +1,8 @@
 <snippet>
 	<content><![CDATA[
 // Requires graph
-template<typename T> // O(V + E)
-void strongly_connected_components(const graph<T> &g, function<void(const vector<int> &)> fscc){
+template<class T> // O(V + E)
+void strongly_connected_components(const graph<T> &g, function<void(vector<int>)> fc){
 	int n = g.n, timer = 0, ncomps = 0, v;
 	vector<int> val(n), comp(n, -1), z, cur;
 	function<int(int)> dfs = [&](int u){
@@ -18,7 +18,7 @@ void strongly_connected_components(const graph<T> &g, function<void(const vector
 				comp[v] = ncomps;
 				cur.push_back(v);
 			}while(v != u);
-			fscc(cur); // Process the component
+			fc(cur); // Process the component
 			cur.clear();
 			++ ncomps;
 		}

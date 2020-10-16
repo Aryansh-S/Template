@@ -191,7 +191,7 @@ template<class T> vector<T> interpolate(const vector<T> &xp, const vector<T> &y,
 	}
 }
 template<class T> ostream &operator<<(ostream &out, const vector<T> &p){
-	for(auto x: p.a) out << x << " ";
+	for(auto x: p) out << x << " ";
 	return out << "\n";
 }
 template<class T> vector<T> generate(const vector<T> &x, int l, int r){ // computes (x-a1)(x-a2)...(x-an) without building tree

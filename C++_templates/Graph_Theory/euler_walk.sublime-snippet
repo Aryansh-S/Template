@@ -1,0 +1,32 @@
+<snippet>
+	<content><![CDATA[
+template<class T>
+vector<int> euler_walk(const graph<T> &g, int src = 0){
+	int n = g.n, m = (int)g.edges.size();
+	vector<int> deg(n), its(n), used(m), res_e;
+	vector<pair<int, int>> q = {{src, -1}};
+	++ deg[src]; // to allow Euler paths, not just cycles
+	while(!q.empty()){
+		auto [u, id] = q.back();
+		int &it = its[u], end = (int)g.adj[u].size();
+		if(it == end){
+			res_e.push_back(id), q.pop_back();
+			continue;
+		}
+		int idn = g.adj[u][it ++];
+		if(!used[idn]){
+			auto &e = g.edges[idn];
+			int v = u ^ e.from ^ e.to;
+			-- deg[u], ++ deg[v];
+			used[idn] = 1, q.emplace_back(v, idn);
+		}
+	}
+	for(auto d: deg) if(d < 0 || (int)res_e.size() != m + 1) return {};
+	return {res_e.rbegin() + 1, res_e.rend()};
+} // Returns the edge list
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>euler_walk</tabTrigger> -->
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope> -->
+</snippet>

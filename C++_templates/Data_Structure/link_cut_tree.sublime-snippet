@@ -1,6 +1,6 @@
 <snippet>
 	<content><![CDATA[
-template<typename node>
+template<class node>
 struct link_cut_tree{
 	bool connected(node *u, node *v){ return lca(u, v) != NULL; }
 	int depth(node *u){ access(u); return get_sz(u->ch[0]); }
@@ -60,7 +60,7 @@ struct link_cut_tree{
 		cout << "--------------------------\n\n";
 	}
 };
-template<typename pnode>
+template<class pnode>
 struct splay_tree{
 	pnode ch[2], p;
 	bool rev;

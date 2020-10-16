@@ -1,0 +1,153 @@
+<snippet>
+	<content><![CDATA[
+template<class Q,
+					Q (*merge)(Q, Q),
+					Q (*identity)(),
+					class L,
+					L (*composite)(L, L),
+					L (*identity_action)(),
+					Q (*act)(L, Q)>
+struct treap{
+	struct node{
+		node *l = 0, *r = 0;
+		Q val, subtr_val;
+		L lazy;
+		int priority = rng(), sz = 1;
+		node(Q val, L lazy): val(val), subtr_val(val), lazy(lazy){ }
+		~node(){
+			delete l;
+			delete r;
+		}
+	};
+	node *root = 0;
+	void push(node *u){
+		if(u && u->lazy){
+			if(u->l){
+				u->l->lazy = composite(u->lazy, u->l->lazy);
+				u->l->val = act(u->lazy, u->l->val);
+				u->l->subtr_val = act(u->lazy, u->l->subtr_val);
+			}
+			if(u->r){
+				u->l->lazy = composite(u->lazy, u->l->lazy);
+				u->l->val = act(u->lazy, u->l->val);
+				u->l->subtr_val = act(u->lazy, u->l->subtr_val);
+			}
+			u->lazy = identity_action();
+		}
+	};
+	void refresh(node *u){
+		u->sz = (u->l ? u->l->sz : 0) + 1 + (u->r ? u->r->sz : 0);
+		u->subtr_val = merge(merge(u->l ? u->l->subtr_val : identity(), u->val), u->r ? u->r->subtr_val : identity());
+	};
+	treap(const vector<Q> &v){
+		root = build(v, 0, (int)v.size());
+	}
+	treap(int n, Q val_init = identity()): treap(vector<Q>(n, val_init)){
+	}
+	void heapify(node *u){
+		if(u){
+			node *v = u;
+			if(u->l && u->l->priority > v->priority) v = u->l;
+			if(u->r && u->r->priority > v->priority) v = u->r;
+			if(u != v){
+				swap(u->priority, v->priority);
+				heapify(v);
+			}
+		}
+	}
+	node *build(const vector<Q> &v, int l, int r){
+		if(r == l) return 0;
+		int m = l + (r - l >> 1);
+		node *c = new node(v[m], identity_action());
+		c->l = build(v, l, m), c->r = build(v, m + 1, r);
+		heapify(c), refresh(c);
+		return c;
+	}
+	int get_sz(node *u){
+		return u ? u->sz : 0;
+	}
+	pair<node *, node *> split_by_key(node* u, Q k){
+		if(!u) return {};
+		if(u->val >= k){
+			auto [a, b] = split_by_key(u->l, k);
+			u->l = b;
+			refresh(u);
+			return {a, u};
+		}
+		else{
+			auto [a, b] = split_by_key(u->r, k);
+			u->r = a;
+			refresh(u);
+			return {u, b};
+		}
+	}
+	pair<node *, node *> split_by_order(node *u, int k){
+		if(!u) return {};
+		if(get_sz(u->l) >= k){
+			auto [a, b] = split_by_order(u->l, k);
+			u->l = b, refresh(u);
+			return {a, u};
+		}
+		else{
+			auto [a, b] = split_by_order(u->r, k - get_sz(u->l) - 1);
+			u->r = a, refresh(u);
+			return {u, b};
+		}
+	}
+	node *combine(node *u, node *v){
+		if(!u || !v) return u ?: v;
+		push(u), push(v);
+		if(v->priority < u->priority){
+			u->r = combine(u->r, v), refresh(u);
+			return u;
+		}
+		else{
+			v->l = combine(u, v->l), refresh(v);
+			return v;
+		}
+	}
+	node *insert(node *u, node *t){
+	// node *insert(node *u, node *t, int pos){ // For the implicit treap
+		if(!u) return t;
+		auto [a, b] = split_by_key(u, t->val);
+		// auto [a, b] = split_by_order(u, pos); // For the implicit treap
+		return combine(combine(a, t), b);
+	}
+	node *erase(node *u, Q k){ // Erase the smallest element equal or greater than k
+	// node *erase(node *u, int k) // For the implicit treap
+		if(!u) return u;
+		node *a = 0, *b = 0, *c = 0;
+		tie(a, b) = split_by_key(u, k);
+		// tie(a, b) = split_by_order(u, k) // For the implicit treap
+		tie(b, c) = split_by_order(b, 1);
+		return combine(a, c);
+	}
+};
+template<class Action>
+void for_each(auto *u, Action act){
+	if(u){ for_each(u->l, act), act(u), for_each(u->r, act); }
+}
+using Q = long long; // Monoid (Query Type)
+Q merge(Q x, Q y){ // merges adjacent intervals
+	return max(x, y);
+}
+Q identity(){ // Monoid Identity
+	return numeric_limits<long long>::min() / 2;
+}
+using L = long long; // Semigroup (Lazy Type)
+L composite(L f, L g){ // composites superset and subset 
+	return f + g;
+}
+L identity_action(int l, int r){
+	return 0;
+}
+Q act(L f, Q x){ // semigroup action of L on Q, act superset onto subset
+	return f + x;
+}
+// treap<Q, merge, identity, L, composite, identity_action, act> trp(a);
+]]></content>
+	<!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
+	<tabTrigger>treap</tabTrigger> -->
+	<!-- Optional: Set a scope to limit where the snippet will trigger -->
+	<scope>source.c++</scope> -->
+</snippet>
